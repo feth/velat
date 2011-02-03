@@ -1,5 +1,5 @@
 #coding: utf-8
-""" types.py from package velat
+""" base.py from package velat
 
     Author and Copyright © Feth Arezki <feth ×AT× tuttu.info>, 2010
 

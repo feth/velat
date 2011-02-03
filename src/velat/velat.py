@@ -3,7 +3,7 @@ from cPickle import dump as pickle, load as unpickle
 from enthought.traits.api import HasTraits, Instance, List, Str
 
 from .algo import heuristic
-from .types import Expense, NOBODY, Person, Transfer
+from .base import Expense, NOBODY, Person, Transfer
 
 
 def autoperson(*args, **kwargs):
