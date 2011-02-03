@@ -1,0 +1,22 @@
+apropos
+-------
+This is a basic shared expenses balance calculator.
+It was made mainly as an exercise to get acquainted to enthought.traits API.
+
+The typical usecase is: you go on holiday or week end with some good friends,
+and you don't want to keep track of money all the time. Velat ("debts", in
+finnish) will do it for you: just remember who paid for what, how much, and who
+took part in what. At the very least you'll want to have only one big activity
+(expense), and count everything in it.
+
+proverb
+-------
+fr: Les bons comptes font les bons amis.
+en: A fair balance makes fair friends.
+
+And I prefer have a machine count for me.
+
+the software
+------------
+This is a working lib, with simple GUI/other interfaces to be built around.
+I think the heuristic is not perfect. And I saw it raise rounding issues... (assertionerrors)

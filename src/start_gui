@@ -1,0 +1,12 @@
+#!/usr/bin/python
+from sys import argv
+from PyQt4.QtGui import QApplication
+
+app = QApplication(argv)
+from velat.gui import Window
+
+w = Window()
+w.show()
+
+app.exec_()
+

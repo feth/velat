@@ -1,0 +1,12 @@
+Licensing term for the software and the containing repository architecture
+--------------------------------------------------------------------------
+
+Author and Copyright © Feth Arezki <feth ×AT× tuttu.info>, 2010
+
+This code is licenced to anybody willing under the AGPLv3 licence (ie GPL, with the additionnal requirement that the code be made available to end users when the software is used through the network).
+#TODO: add ref to AGPL
+
+Licensing philosophy
+--------------------
+The author could be quite liberal in granting another licence, if only asked.
+The author only cares about sharing and collaborating, hence the choice of the restrictive AGPL license.
