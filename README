@@ -18,5 +18,5 @@ And I prefer have a machine count for me.
 
 the software
 ------------
-This is a working lib, with simple GUI/other interfaces to be built around.
+This is a working lib, with simple GUI/other interfaces to be built around (a Qt4 Gui is almost done).
 I think the heuristic is not perfect. And I saw it raise rounding issues... (assertionerrors)

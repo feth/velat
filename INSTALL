@@ -1,0 +1,5 @@
+from source:
+% mkvirtualenv velat #optionnal
+% git clone git://github.com/feth/velat_core.git
+% cd velat_core
+% python setup.py install
