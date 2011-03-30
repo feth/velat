@@ -1,20 +1,34 @@
 #coding: utf-8
 """ base.py from package velat
 
-    Author and Copyright © Feth Arezki <feth ×AT× tuttu.info>, 2010
+    Author and Copyright © Feth Arezki <feth ×AT× tuttu.info>, 2010-2011
 
-    This code is licenced to anybody willing under the AGPLv3 licence (ie GPL, with
-    the additionnal requirement that the code be made available to end users when
-    the software is used through the network).
-    #TODO: add ref to AGPL
+    This file is part of velat-core.
 
-    The author could be quite liberal in granting another licence when asked.
+    the program velat-core is free software: you can redistribute it and/or
+    modify it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
     Here be basic types as needed by velat, a simple expenses calculator
 """
 
+#pylint: disable=F0401
+#Not my fault; seems pylint won't import enthought.traits.api
 from enthought.traits.api import Float, HasTraits, Instance, List, Str
+#pylint: disable=F0401
+#pylint: disable=W1001
+#As pylint does not cut it with HasTraits,
+#it believes our classes are old style classes
 
 
 class Person(HasTraits):
@@ -25,17 +39,29 @@ class Person(HasTraits):
     information = Str
 
     def __init__(self, name):
+        """
+        name: string
+        """
         self.name = name
 
     def __repr__(self):
+        """
+        object like repr. Maybe should contain more than just the name.
+        """
         return """<Person "%s">""" % self.name
 
     def _totalpaid(self):
+        """
+        How much this person paid
+        """
         #FIXME: stub
         return 42
     totalpaid = property(fget=_totalpaid)
 
     def _totalowed(self):
+        """
+        How much this person owes
+        """
         #FIXME: stub
         return 43
     totalowed = property(fget=_totalowed)
@@ -47,6 +73,7 @@ NOBODY = Person("Nobody")
 class Transfer(HasTraits):
     """
     A transfer of money between 2 persons
+    giver, receiver, value, and free-form context
     """
     giver = Instance(Person)
     receiver = Instance(Person)
@@ -54,10 +81,15 @@ class Transfer(HasTraits):
     context = Str
 
     def unicode(self):
+        """
+        CLI friendly repr of a transfer
+        """
         return "%s -[%f]-> %s" % (self.giver, self.value, self.receiver)
 
     def error_msg(self):
-        """ return None when valid """
+        """
+        return None when valid
+        """
         if self.giver == NOBODY:
             return "Please select a valid person as giver"
         if self.receiver == NOBODY:
@@ -69,32 +101,48 @@ class Transfer(HasTraits):
         return
 
     def _givername(self):
+        """
+        returns str: the giver
+        """
         if self.giver is None:
             return ""
         return self.giver.name
     givername = property(fget=_givername)
 
     def _receivername(self):
+        """
+        returns str: the receiver
+        """
         if self.receiver is None:
             return ""
         return self.receiver.name
     receivername = property(fget=_receivername)
 
     def _iter_custom_items(self):
+        """
+        part of save/restore routine: what should be saved
+        """
+        #pylint: disable=E1101
+        #trait_names belongs to HasTraits
         for name in self.trait_names():
             if name in ('trait_added', 'trait_modified'):
                 continue
             yield name, getattr(self, name)
+        #pylint: enable=E1101
 
     def save(self):
-        self.save_dict = dict(
-            name_value
-            for name_value in self._iter_custom_items()
-        )
+        """
+        sets self.save_dict as saveable dict
+        """
+        self.save_dict = dict(self._iter_custom_items())
 
     def restore(self):
+        """
+        see save(): uses self.save_dict
+        """
         for name_value in self.save_dict.iteritems():
             setattr(self, *name_value)
+
 
 class PartTaking(HasTraits):
     """
@@ -114,21 +162,36 @@ class PartTaking(HasTraits):
     context = Str
 
     def __init__(self, person=NOBODY, paid=0.0, taken=0.0, shares=0.0):
+        """
+        paid: float
+        person: Person
+        shares: float
+        taken: float
+        context: free form str
+        """
         self.paid = paid
         self.person = person
         self.shares = shares
         self.taken = taken
 
     def _balance(self, sharevalue):
-        return self.paid - self.taken - self.shares*sharevalue
+        """
+        computes balance (float)
+        """
+        return self.paid - self.taken - self.shares * sharevalue
 
     def balance(self, sharevalue):
+        """
+        returns: tuple person - balance (float).
+        """
         return self.person, self._balance(sharevalue)
 
     def __repr__(self):
-        return """<Part [person %s paid %s, took %s and %s shares]>""" % (
-            self.person.name, self.paid, self.taken, self.shares
-        )
+        """
+        object like repr. Maybe should contain more than just the name.
+        """
+        return """<Part [person %s paid %s, took %s and %s shares]>""" % \
+         (self.person.name, self.paid, self.taken, self.shares)
 
 
 class Expense(HasTraits):
@@ -141,12 +204,21 @@ class Expense(HasTraits):
     'parts' attribute: a list of PartTaking
     """
     name = Str
-    parts=List(trait=Instance(klass=PartTaking, factory=PartTaking))
+    parts = List(trait=Instance(klass=PartTaking, factory=PartTaking))
 
     def __init__(self, name):
+        """
+        name: str
+
+        An expense really is an activity. It contains parts/shares
+        representing the fact of taking part or paying for it.
+        """
         self.name = name
 
     def sharevalue(self):
+        """
+        Price of the basic proportionnal share.
+        """
         sharesnb = 0.0
         cost = 0.0
         oob_cost = 0.0
@@ -156,30 +228,44 @@ class Expense(HasTraits):
             oob_cost += item.taken
         leftcost = cost - oob_cost
         if sharesnb == 0:
-            return 1 #we don't care. Neutral element, quicker in calculus.
+            return 1  # we don't care. Neutral element, quicker computation.
         return leftcost / sharesnb
 
     def balance(self):
+        """
+        This generator aggregates balances in all shares.
+        """
         sharevalue = self.sharevalue()
         return (item.balance(sharevalue) for item in self.parts)
 
     def newtakepart(self, person, paid=0.0, taken=0.0, shares=0.0):
+        """
+        new part-taking
+        """
         part = PartTaking(person, paid, taken, shares)
         self.parts.append(part)
         return part
 
     def _paidfor(self):
+        """
+        How much was paid for this expense? (ie. price)
+        """
         return sum(item.paid for item in self.parts)
 
     paidfor_property = property(fget=_paidfor)
 
     def _ppl_nb(self):
+        """
+        How many people took part to this expense/activity?
+        """
         return len(frozenset(item.person for item in self.parts))
 
     ppl_nb_property = property(fget=_ppl_nb)
 
     def _parts_nb(self):
+        """
+        How many parts/shares in this expense/activity?
+        """
         return len(self.parts)
 
     parts_nb = property(fget=_parts_nb)
-
