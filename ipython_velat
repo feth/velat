@@ -8,7 +8,10 @@ if __name__ != '__main__':
     stderr.write("Not doing anything, %s is meant to be ran directly\n")
     sys.exit(2)
 
-from IPython.frontend.terminal.embed import InteractiveShellEmbed
+try:
+    from IPython.frontend.terminal.embed import InteractiveShellEmbed
+except ImportError:
+    raise ImportError('Missing Ipython >= 0.11 : pip install ipython')
 
 ipshell = InteractiveShellEmbed()
 ipshell.banner = """IPython interpreter with velat imported in it.
