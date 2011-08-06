@@ -1,15 +1,17 @@
 #!/usr/bin/python
 
 from os.path import abspath, basename
-from sys import exit, path, stderr, version
+from sys import path, stderr, version
+import sys
 
 if __name__ != '__main__':
     stderr.write("Not doing anything, %s is meant to be ran directly\n")
-    exit(2)
+    sys.exit(2)
 
-from IPython import Shell
+from IPython.frontend.terminal.embed import InteractiveShellEmbed
 
-banner = """IPython interpreter with velat imported in it.
+ipshell = InteractiveShellEmbed()
+ipshell.banner = """IPython interpreter with velat imported in it.
 
 Python sys.version:
 %s
@@ -17,42 +19,33 @@ Python sys.version:
 The variable 'instance' refers to a Velat instance.
 Velat is the class representing the main entry point.
 The function 'load(filename) returns a velat instance from a saved instance.""" % version
-ips = Shell.IPShellEmbed(banner=banner)
+
 
 localdir=abspath(basename(__file__))
 
 if localdir not in [abspath(item) for item in path]:
     path.insert(0, localdir)
 
-try:
-    #setting up useful local variables
-    from velat.velat import Velat, load
-except ImportError, err:
-    if err.args and err.args[0] == 'No module named enthought.traits.api':
-        stderr.write(
-"""Fatal: Missing dependency: enthought.traits.api.
- * home url: http://code.enthought.com/projects/traits/
- * d/l url: http://pypi.python.org/pypi/Traits
- * On debian and likes, look for a package named 'python-traits'.
-"""
-        )
-        exit(2)
-    raise
+#setting up useful local variables
+
+#Test access to enthought.traits.api.
+# * home url: http://code.enthought.com/projects/traits/
+# * d/l url: http://pypi.python.org/pypi/Traits
+# * On debian and likes, look for a package named 'python-traits'.
+from velat.velat import Velat, load
 
 #clean up local variables that might confuse the shell user
 #(keeping this in a single file script induces some pollution)
 del abspath
-del banner
 del basename
-del exit
 del localdir
 del path
-del Shell
+del InteractiveShellEmbed
 del stderr
 del version
 
 instance = Velat()
 
 #fire up the shell
-ips()
+ipshell()
 

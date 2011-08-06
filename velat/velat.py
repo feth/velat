@@ -1,6 +1,6 @@
 from cPickle import dump as pickle, load as unpickle
 
-from enthought.traits.api import HasTraits, Instance, List, Str
+from traits.api import HasTraits, Instance, List, Str
 
 from .algo import heuristic
 from .base import Expense, NOBODY, Person, Transfer

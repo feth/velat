@@ -23,8 +23,8 @@
 """
 
 #pylint: disable=F0401
-#Not my fault; seems pylint won't import enthought.traits.api
-from enthought.traits.api import Float, HasTraits, Instance, List, Str
+#Not my fault; seems pylint won't import traits.api
+from traits.api import Float, HasTraits, Instance, List, Str
 #pylint: disable=F0401
 #pylint: disable=W1001
 #As pylint does not cut it with HasTraits,
