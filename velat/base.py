@@ -22,13 +22,34 @@
     Here be basic types as needed by velat, a simple expenses calculator
 """
 
+from decimal import Decimal
 #pylint: disable=F0401
 #Not my fault; seems pylint won't import traits.api
-from traits.api import Float, HasTraits, Instance, List, Str
+from traits.api import HasTraits, Instance, List, Str, TraitHandler
 #pylint: disable=F0401
 #pylint: disable=W1001
 #As pylint does not cut it with HasTraits,
 #it believes our classes are old style classes
+
+
+class DecimalTrait(TraitHandler):
+    def validate(self, object, name, value):
+        if type(value) is Decimal:
+            return value
+        elif type(value) is float:
+            value = '%.5f' % value
+
+        try:
+            value = Decimal(value)
+        except InvalidOperation:
+            self.error(object, name, value)
+
+        return value
+
+    def info(self):
+        return '**given a Decimal, a string, a float or whatever, tries and '\
+            'returns a Decimal. For maximum precision, give me a string like '\
+            '"2.4567897654"**'
 
 
 class Person(HasTraits):
@@ -80,7 +101,7 @@ class Transfer(HasTraits):
     """
     giver = Instance(Person)
     receiver = Instance(Person)
-    value = Float(0.0)
+    value = DecimalTrait()
     context = Str
 
     def unicode(self):
@@ -158,10 +179,10 @@ class PartTaking(HasTraits):
     * taking an extra of known cost, for instance:
       *  "A took an extra cognac for 4€"
     """
-    paid = Float(0.0)
+    paid = DecimalTrait()
     person = Instance(Person)
-    shares = Float(0.0)
-    taken = Float(0.0)
+    shares = DecimalTrait()
+    taken = DecimalTrait()
     context = Str
 
     def __init__(self, person=NOBODY, paid=0.0, taken=0.0, shares=0.0):
@@ -189,12 +210,20 @@ class PartTaking(HasTraits):
         """
         return self.person, self._balance(sharevalue)
 
+    def infos(self):
+        yield('person', self.person.name)
+        if self.paid:
+            yield ('paid', self.paid)
+        if self.taken:
+            yield ('taken', self.taken)
+        if self.shares:
+            yield ('shares', self.shares)
+
     def __repr__(self):
         """
         object like repr. Maybe should contain more than just the name.
         """
-        return """<Part [person %s paid %s, took %s and %s shares]>""" % \
-         (self.person.name, self.paid, self.taken, self.shares)
+        return """<Part [%s]>""" % ' - '.join('%s: %s' % item for item in self.infos())
 
 
 class Expense(HasTraits):
