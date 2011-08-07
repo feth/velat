@@ -51,7 +51,14 @@ class Velat(HasTraits):
     def solve(self):
         return heuristic(self.totals())
 
+    def solve_sorted(self):
+        solution = self.solve()
+        solution.sort()
+        return solution
+
     def newperson(self, name):
+        if any(person.name == name for person in self.persons):
+            raise ValueError("Person of name '%s' already registered" % name)
         person = Person(name)
         self.persons.append(person)
         return person
