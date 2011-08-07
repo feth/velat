@@ -66,6 +66,9 @@ class Person(HasTraits):
         return 43
     totalowed = property(fget=_totalowed)
 
+    def __cmp__(self, other):
+        return cmp(self.name, other.name)
+
 
 NOBODY = Person("Nobody")
 
