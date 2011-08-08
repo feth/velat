@@ -73,6 +73,9 @@ class Velat(HasTraits):
             amount=None):
         expense = Expense(name)
 
+        if payers is None:
+            payers = {}
+
         if (payer and payers) or (payer and not amount):
             raise InvalidAPICall()
 
