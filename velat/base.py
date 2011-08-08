@@ -220,7 +220,7 @@ class PartTaking(object):
 class Expense(object):
     """
     Expenses are costly ativities.
-    For instance, cinema is usely being paid for, this is why we call it an
+    For instance, cinema is usualy being paid for, this is why we call it an
     expense.
 
     Expenses don't have a cost per se: costs and consumers are declared in the
@@ -238,9 +238,12 @@ class Expense(object):
         self.name = name
         self.parts = []
 
-    def sharevalue(self):
+    def share_value(self):
         """
         Price of the basic proportionnal share.
+
+        For instance, if 5 person paid 50$, then the share value is 10$
+        (if we consider each person took exacly one share)
         """
         sharesnb = _to_decimal(0.0)
         cost = _to_decimal(0.0)
@@ -261,9 +264,18 @@ class Expense(object):
         sharevalue = self.sharevalue()
         return (item.balance(sharevalue) for item in self.parts)
 
-    def newtakepart(self, person, paid=0.0, taken=0.0, shares=0.0):
+    def take_part(self, person, paid=0.0, taken=0.0, shares=0.0):
         """
-        new part-taking
+        An user take part in this expense.
+
+        :paid: What this person paid for this expense.
+        :shares: The number of shares this person represents.
+        :taken: The extra amount specifically consumed by one user.
+                Use case: Everybody took the same menu but Alice, who took
+                foie gras for an extra 10$.
+
+        All paid, shares and taken are decimals. (Read again, "shares" is also 
+        a decimal).
         """
         part = PartTaking(person, paid=paid, taken=taken, shares=shares)
         self.parts.append(part)
