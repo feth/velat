@@ -23,47 +23,35 @@
 """
 
 from decimal import Decimal
-#pylint: disable=F0401
-#Not my fault; seems pylint won't import traits.api
-from traits.api import HasTraits, Instance, List, Str, TraitHandler
-#pylint: disable=F0401
-#pylint: disable=W1001
-#As pylint does not cut it with HasTraits,
-#it believes our classes are old style classes
 
 
-class DecimalTrait(TraitHandler):
-    def validate(self, object, name, value):
-        if type(value) is Decimal:
-            return value
-        elif type(value) is float:
-            value = '%.5f' % value
-
-        try:
-            value = Decimal(value)
-        except InvalidOperation:
-            self.error(object, name, value)
-
+def _to_decimal(value):
+    """
+    given a Decimal, a string, a float or whatever, tries and
+    returns a Decimal. For maximum precision, give me a string like
+    "2.4567897654"
+    """
+    if type(value) is Decimal:
         return value
+    elif type(value) is float:
+        value = '%.5f' % value
 
-    def info(self):
-        return '**given a Decimal, a string, a float or whatever, tries and '\
-            'returns a Decimal. For maximum precision, give me a string like '\
-            '"2.4567897654"**'
+    value = Decimal(value)
+
+    return value
 
 
-class Person(HasTraits):
+class Person(object):
     """
     a person is an object to which credits and debts can be assigned
     """
-    name = Str
-    information = Str
 
-    def __init__(self, name):
+    def __init__(self, name, information=""):
         """
         name: string
         """
         self.name = name
+        self.information = information
 
     def __repr__(self):
         """
@@ -94,15 +82,23 @@ class Person(HasTraits):
 NOBODY = Person("Nobody")
 
 
-class Transfer(HasTraits):
+class Transfer(object):
     """
     A transfer of money between 2 persons
     giver, receiver, value, and free-form context
     """
-    giver = Instance(Person)
-    receiver = Instance(Person)
-    value = DecimalTrait()
-    context = Str
+
+    def __init__(self, giver, receiver, value, context=""):
+        """
+        Parameters
+        ----------
+        giver, receiver: Person
+        value: decimal compatible
+        """
+        self.giver = giver
+        self.receiver = receiver
+        self.value = _to_decimal(value)
+        self.context = context
 
     def unicode(self):
         """
@@ -168,7 +164,7 @@ class Transfer(HasTraits):
             setattr(self, *name_value)
 
 
-class PartTaking(HasTraits):
+class PartTaking(object):
     """
     Taking part in an costly activity / expense means
     * paying something for it
@@ -179,24 +175,19 @@ class PartTaking(HasTraits):
     * taking an extra of known cost, for instance:
       *  "A took an extra cognac for 4€"
     """
-    paid = DecimalTrait()
-    person = Instance(Person)
-    shares = DecimalTrait()
-    taken = DecimalTrait()
-    context = Str
 
-    def __init__(self, person=NOBODY, paid=0.0, taken=0.0, shares=0.0):
+    def __init__(self, person, paid=0, shares=0, taken=0, context=""):
         """
-        paid: float
+        Parameters:
+        -----------
         person: Person
-        shares: float
-        taken: float
-        context: free form str
+        paid, shares, taken : Decimal compatible
         """
-        self.paid = paid
+        self.paid = _to_decimal(paid)
         self.person = person
-        self.shares = shares
-        self.taken = taken
+        self.shares = _to_decimal(shares)
+        self.taken = _to_decimal(taken)
+        self.context = context
 
     def _balance(self, sharevalue):
         """
@@ -226,7 +217,7 @@ class PartTaking(HasTraits):
         return """<Part [%s]>""" % ' - '.join('%s: %s' % item for item in self.infos())
 
 
-class Expense(HasTraits):
+class Expense(object):
     """
     Expenses are costly ativities.
     For instance, cinema is usely being paid for, this is why we call it an
@@ -235,25 +226,25 @@ class Expense(HasTraits):
     Expenses don't have a cost per se: costs and consumers are declared in the
     'parts' attribute: a list of PartTaking
     """
-    name = Str
-    parts = List(trait=Instance(klass=PartTaking, factory=PartTaking))
 
     def __init__(self, name):
         """
         name: str
+        parts: list of PartTaking
 
         An expense really is an activity. It contains parts/shares
         representing the fact of taking part or paying for it.
         """
         self.name = name
+        self.parts = []
 
     def sharevalue(self):
         """
         Price of the basic proportionnal share.
         """
-        sharesnb = 0.0
-        cost = 0.0
-        oob_cost = 0.0
+        sharesnb = _to_decimal(0.0)
+        cost = _to_decimal(0.0)
+        oob_cost = _to_decimal(0.0)
         for item in self.parts:
             cost += item.paid
             sharesnb += item.shares
@@ -274,7 +265,7 @@ class Expense(HasTraits):
         """
         new part-taking
         """
-        part = PartTaking(person, paid, taken, shares)
+        part = PartTaking(person, paid=paid, taken=taken, shares=shares)
         self.parts.append(part)
         return part
 
