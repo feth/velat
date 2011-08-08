@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+
 def _exactmmatch(personstotals, total):
     """
     personstotals is expected as a list of (person, credit)
@@ -15,6 +18,10 @@ def _reverseabsvalue(item, otheritem):
     """
     return cmp(abs(otheritem[1]), abs(item[1]))
 
+
+DEC_O = Decimal(0)
+
+
 def heuristic(totals):
     """
     totals is expected as a dict: {person, credit}
@@ -23,17 +30,17 @@ def heuristic(totals):
     debts = [
         [person, value]
         for person, value in totals.iteritems()
-        if value < 0.0
+        if value < DEC_O
     ]
     lends = [
         [person, value]
         for person, value in totals.iteritems()
-        if value > 0.0
+        if value > DEC_O
     ]
     result = [
-        (person, None, 0.0)
+        (person, None, DEC_O)
         for person, value in totals.iteritems()
-        if value == 0.0
+        if value == DEC_O
     ]
     #loop
     while lends or debts:
@@ -67,7 +74,7 @@ def heuristic(totals):
         #purge
         for collection in (lends, debts):
             for item in tuple(collection):
-                if item[1] == 0.0:
+                if item[1] == DEC_O:
                     collection.remove(item)
 
     return result
