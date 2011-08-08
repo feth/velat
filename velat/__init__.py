@@ -29,7 +29,33 @@ ValueError: Person of name 'alice' already registered
 <Part [person: camilla - paid: 42]>
 >>> instance.solve_sorted()
 [(<Person "alice">, <Person "camilla">, Decimal('21.00000')), (<Person "bob">, <Person "camilla">, Decimal('21.00000'))]
+>>> # another usecase on the same instance: restaurant
+>>> restaurant = instance.add_expense("restaurant")
+>>> # everybody takes a drink and the same menu
+>>> # gertrud invites her boyfriend
+>>> #hugo pays the bill: 143
+>>> # drink prices:
+>>> apple_juice = 3
+>>> banana_mix = 2
+>>> camomilla = 1
+>>> tap_water = 0
+>>> # not entering the menu price because it is the same for everybody
 >>> damian = instance.add_person("damian")
+>>> restaurant.take_part(damian, shares=1, taken=apple_juice)
+<Part [person: damian - taken: 3 - shares: 1]>
+>>> ernest = instance.add_person("ernest")
+>>> restaurant.take_part(ernest, shares=1, taken=banana_mix)
+<Part [person: ernest - taken: 2 - shares: 1]>
+>>> fanny = instance.add_person("fanny")
+>>> restaurant.take_part(fanny, shares=1, taken=camomilla)
+<Part [person: fanny - taken: 1 - shares: 1]>
+>>> gertrud = instance.add_person("gertrud")
+>>> restaurant.take_part(gertrud, shares=2, taken=banana_mix + camomilla)
+<Part [person: gertrud - taken: 3 - shares: 2]>
+>>> hugo = instance.add_person("hugo")
+>>> restaurant.take_part(hugo, shares=1, taken=tap_water, paid=143)
+<Part [person: hugo - paid: 143 - shares: 1]>
+>>> instance.solve_sorted()
 
 """
 
