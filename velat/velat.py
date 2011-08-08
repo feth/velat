@@ -32,10 +32,10 @@ class InvalidAPICall(object):
 
 class Velat(object):
 
-    def __init__(name, expenses=None, persons=None, transfers=None, description="")
-       self.expenses = expenses 
-       self.persons = persons
-       self.transfers = transfers
+    def __init__(self, name="", expenses=None, persons=None, transfers=None, description=""):
+       self.expenses = expenses or []
+       self.persons = persons or []
+       self.transfers = transfers or []
        self.description = description
 
     def balance(self):

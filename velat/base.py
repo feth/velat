@@ -261,7 +261,7 @@ class Expense(object):
         """
         This generator aggregates balances in all shares.
         """
-        sharevalue = self.sharevalue()
+        sharevalue = self.share_value()
         return (item.balance(sharevalue) for item in self.parts)
 
     def take_part(self, person, paid=0.0, taken=0.0, shares=0.0):
