@@ -38,7 +38,10 @@ class Velat(object):
        self.transfers = transfers or []
        self.description = description
 
-    def balance(self):
+    def actions_log(self):
+        """
+        Iterator that yields (person, credit) or (person, dept) pairs
+        """
         for transfer in self.transfers:
             yield transfer.giver, transfer.value
             yield transfer.receiver, - transfer.value
@@ -48,15 +51,23 @@ class Velat(object):
 
     def totals(self):
         totals = {}
-        for person, balance in self.balance():
+        for person, balance in self.actions_log():
             totals.setdefault(person, 0)
             totals[person] += balance
         return totals
 
     def solve(self):
+        """
+        Preconisations
+        optimizes the number of exchanges
+        Returns a list of transfers that should be performed
+        """
         return heuristic(self.totals())
 
     def solve_sorted(self):
+        """
+        cf solve(): sorted list (ie. always the same)
+        """
         solution = self.solve()
         solution.sort()
         return solution
@@ -90,15 +101,6 @@ class Velat(object):
     def save(self, filename):
         with open(filename, 'w') as filedesc:
             pickle(self, filedesc)
-
-    def listfor(self, word):
-        if word == "expense":
-            return self.expenses
-        if word == "person":
-            return self.persons
-        if word == "transfer":
-            return self.transfers
-        raise ValueError(word)
 
     def len_expenses_and_parts(self):
         return len(self.expenses) + sum(
