@@ -26,6 +26,12 @@ def autotransfer(*args, **kwargs):
         giver=NOBODY, receiver=NOBODY, value=0.0, context= "%d" % autotransfer.index
         )
 
+class VelatException(object):
+    pass
+
+class InvalidAPICall(object):
+    pass
+
 class Velat(HasTraits):
     name = Str
     expenses = List(trait=Instance(klass=Expense, factory=autoexpense))
@@ -56,15 +62,26 @@ class Velat(HasTraits):
         solution.sort()
         return solution
 
-    def newperson(self, name):
+    def add_person(self, name):
         if any(person.name == name for person in self.persons):
             raise ValueError("Person of name '%s' already registered" % name)
         person = Person(name)
         self.persons.append(person)
         return person
 
-    def newexpense(self, name):
+    def add_expense(self, name, payer=None, owers=None, payers=None,
+            amount=None):
         expense = Expense(name)
+
+        if (payer and payers) or (payer and not amount):
+            raise InvalidAPICall()
+
+        if payer and amount:
+            payers = {payer: amount}
+
+        for payer, amount in payers.items():
+            expense.take_part(person, paid=amount, shares=1)
+
         self.expenses.append(expense)
         return expense
 
@@ -89,4 +106,3 @@ class Velat(HasTraits):
 def load(filename):
     with open(filename, 'r') as filedesc:
         return unpickle(filedesc)
-
