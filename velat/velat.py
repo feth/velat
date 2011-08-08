@@ -1,7 +1,5 @@
 from cPickle import dump as pickle, load as unpickle
 
-from traits.api import HasTraits, Instance, List, Str
-
 from algo import heuristic
 from base import Expense, NOBODY, Person, Transfer
 
@@ -32,12 +30,13 @@ class VelatException(object):
 class InvalidAPICall(object):
     pass
 
-class Velat(HasTraits):
-    name = Str
-    expenses = List(trait=Instance(klass=Expense, factory=autoexpense))
-    persons = List(trait=Instance(klass=Person, factory=autoperson))
-    transfers = List(trait=Instance(klass=Transfer))
-    description = Str
+class Velat(object):
+
+    def __init__(name, expenses=None, persons=None, transfers=None, description="")
+       self.expenses = expenses 
+       self.persons = persons
+       self.transfers = transfers
+       self.description = description
 
     def balance(self):
         for transfer in self.transfers:
