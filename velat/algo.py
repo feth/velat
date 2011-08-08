@@ -1,4 +1,9 @@
-from decimal import Decimal
+from decimal import Decimal, getcontext, ROUND_FLOOR
+
+getcontext().rounding=ROUND_FLOOR
+
+DEC_O = Decimal(0)
+PRECISION = Decimal("0.0000001")
 
 
 def _exactmmatch(personstotals, total):
@@ -8,7 +13,7 @@ def _exactmmatch(personstotals, total):
     is not contained in personstotals
     """
     for otherperson, othertotal in personstotals:
-        if othertotal != - total:
+        if othertotal.quantize(PRECISION) != - total.quantize(PRECISION):
             continue
         return otherperson
 
@@ -17,9 +22,6 @@ def _reverseabsvalue(item, otheritem):
     item, otheritem is expected as (*, number, ****)
     """
     return cmp(abs(otheritem[1]), abs(item[1]))
-
-
-DEC_O = Decimal(0)
 
 
 def heuristic(totals):
