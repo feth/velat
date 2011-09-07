@@ -1,6 +1,6 @@
 from cPickle import dump as pickle, load as unpickle
 
-from algo import heuristic
+import peinard
 from base import Expense, NOBODY, Person, Transfer
 
 
@@ -62,7 +62,7 @@ class Velat(object):
         optimizes the number of exchanges
         Returns a list of transfers that should be performed
         """
-        return heuristic(self.totals())
+        return peinard.heuristic(self.totals())
 
     def solve_sorted(self):
         """
