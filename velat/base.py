@@ -46,6 +46,8 @@ class Person(object):
     a person is an object to which credits and debts can be assigned
     """
 
+    SECTIONS = 'name', 'information', 'balance', 'total paid'
+
     def __init__(self, name, information=""):
         """
         name: string
@@ -77,6 +79,17 @@ class Person(object):
 
     def __cmp__(self, other):
         return cmp(self.name, other.name)
+
+    def __getitem__(self, value):
+        if value == 0:
+            return self.name
+        if value == 1:
+            return self.information
+        if value == 2:
+            return self.totalowed
+        if value == 3:
+            return self.totalpaid
+        raise ValueError('%s is not in 0..3' % value)
 
 
 NOBODY = Person("Nobody")
