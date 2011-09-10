@@ -98,6 +98,11 @@ class Velat(object):
         self.expenses.append(expense)
         return expense
 
+    def add_transfer(self, giver, receiver, amount, context=""):
+        transfer = Transfer(giver, receiver, amount, context)
+        self.transfers.append(transfer)
+        return transfer
+
     def save(self, filename):
         with open(filename, 'w') as filedesc:
             pickle(self, filedesc)
