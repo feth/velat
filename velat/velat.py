@@ -1,4 +1,7 @@
 from cPickle import dump as pickle, load as unpickle
+import os
+import shutil
+import tempfile
 
 import peinard
 from base import Expense, NOBODY, Person, Transfer
@@ -104,9 +107,12 @@ class Velat(object):
         return transfer
 
     def save(self, filename):
-        with open(filename, 'w') as filedesc:
-            pickle(self, filedesc)
-
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        pickle(self, tmp)
+        tmp.close()
+        shutil.copyfile(tmp.name, filename)
+        os.unlink(tmp.name)
+    
     def len_expenses_and_parts(self):
         return len(self.expenses) + sum(
                 len(expense.parts) for expense in self.expenses
