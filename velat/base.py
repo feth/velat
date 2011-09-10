@@ -40,13 +40,35 @@ def _to_decimal(value):
 
     return value
 
+def _valid_section(sections, column, edit=False):
+    sections_nb = len(sections)
+    if column > sections_nb:
+        raise ValueError('%s is not in 0..%d' % (value, sections_nb))
+    if not edit:
+        return
+    if not sections[column][1]:
+        raise ValueError('This value is not editable')
 
-class Person(object):
+class TabularObject(object):
+    SECTIONS = () # tuple of tuples: ('name', editable_bool)
+
+
+    def get_by_col(self, column):
+        sections = self.SECTIONS
+        _valid_section(sections, column)
+        return getattr(self, sections[column][0])
+    
+    def set_by_col(self, column, value):
+        sections = self.SECTIONS
+        _valid_section(sections, column, edit=True)
+        setattr(self, sections[column][0], value)
+
+class Person(TabularObject):
     """
     a person is an object to which credits and debts can be assigned
     """
 
-    SECTIONS = 'name', 'information', 'balance', 'total paid'
+    SECTIONS = ('name', True), ('information', True), ('balance', False)
 
     def __init__(self, name, information=""):
         """
@@ -61,45 +83,30 @@ class Person(object):
         """
         return """<Person "%s">""" % self.name
 
-    def _totalpaid(self):
-        """
-        How much this person paid
-        """
-        #FIXME: stub
-        return 42
-    totalpaid = property(fget=_totalpaid)
-
-    def _totalowed(self):
+    def _balance(self):
         """
         How much this person owes
         """
         #FIXME: stub
         return 43
-    totalowed = property(fget=_totalowed)
+    balance = property(fget=_balance)
 
     def __cmp__(self, other):
         return cmp(self.name, other.name)
 
-    def __getitem__(self, value):
-        if value == 0:
-            return self.name
-        if value == 1:
-            return self.information
-        if value == 2:
-            return self.totalowed
-        if value == 3:
-            return self.totalpaid
-        raise ValueError('%s is not in 0..3' % value)
 
 
 NOBODY = Person("Nobody")
 
 
-class Transfer(object):
+class Transfer(TabularObject):
     """
     A transfer of money between 2 persons
     giver, receiver, value, and free-form context
     """
+
+    SECTIONS = ('giver', False), ('receiver', False), ('value', False), \
+            ('context', True)
 
     def __init__(self, giver, receiver, value, context=""):
         """
@@ -230,7 +237,7 @@ class PartTaking(object):
         return """<Part [%s]>""" % ' - '.join('%s: %s' % item for item in self.infos())
 
 
-class Expense(object):
+class Expense(TabularObject):
     """
     Expenses are costly ativities.
     For instance, cinema is usualy being paid for, this is why we call it an
@@ -239,6 +246,8 @@ class Expense(object):
     Expenses don't have a cost per se: costs and consumers are declared in the
     'parts' attribute: a list of PartTaking
     """
+
+    SECTIONS = ('name', True), ('parts', False)
 
     def __init__(self, name):
         """
