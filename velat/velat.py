@@ -57,6 +57,9 @@ class Velat(object):
         for person, balance in self.actions_log():
             totals.setdefault(person, 0)
             totals[person] += balance
+        # update balance attribute of persons
+        for person in self.persons:
+            person.balance = totals.get(person, 0)
         return totals
 
     def solve(self):
