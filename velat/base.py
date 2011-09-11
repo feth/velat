@@ -77,19 +77,16 @@ class Person(TabularObject):
         self.name = name
         self.information = information
 
+        # updated by velat, not by us!
+        # help welcome if you think of a nicer scheme
+        self.balance = 0.0
+
     def __repr__(self):
         """
         object like repr. Maybe should contain more than just the name.
         """
         return """<Person "%s">""" % self.name
 
-    def _balance(self):
-        """
-        How much this person owes
-        """
-        #FIXME: stub
-        return 43
-    balance = property(fget=_balance)
 
     def __cmp__(self, other):
         return cmp(self.name, other.name)
